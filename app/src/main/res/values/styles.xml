@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- Uygulamanız için temel tema -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Burada gerekli tema ayarlarını yapabilirsiniz -->
+        <!-- Örneğin: -->
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
+    </style>
+
+</resources>
