@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">nfc_reader</string>
-    <string name="activate_tag">Activate Tag</string>
+    <string name="app_name">NFC Reader</string>
+    <string name="nfc_test">NFC TEST</string>
+    <string name="broadcast">BROADCAST</string>
 </resources>

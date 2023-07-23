@@ -54,13 +54,13 @@ public class NFCManager {
         nfcAdapter.disableForegroundDispatch((AppCompatActivity) context);
     }
 
-    public void writeNFC(String text) {
+    public void writeNFC(byte[] tagId) {
         try {
             if (myTag == null) {
                 Toast.makeText(context, Error_Detected, Toast.LENGTH_LONG).show();
             } else {
                 LOGGER.info("Trying to write");
-                writeNdefMessage(createNdefMessage(text));
+                writeNdefMessage(createNdefMessage(bytesToHexString(tagId)));
                 Toast.makeText(context, Write_Success, Toast.LENGTH_LONG).show();
             }
         } catch (IOException | FormatException e) {

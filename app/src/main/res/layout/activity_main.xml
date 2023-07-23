@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="33dp"
             android:fontFamily="casual"
-            android:text="NFC TEST"
+            android:text="@string/nfc_test"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/activate_tag" />
+            android:text="@string/broadcast" />
     </LinearLayout>
 
 

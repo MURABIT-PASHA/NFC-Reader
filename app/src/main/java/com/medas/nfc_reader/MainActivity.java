@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
         nfcManager = new NFCManager(this);
 
         activateButton.setOnClickListener(v -> {
-            nfcManager.writeNFC("Hello");
+            byte[] idBytes = {-30, -92, 70, 68};
+            nfcManager.writeNFC(idBytes);
         });
     }
 
