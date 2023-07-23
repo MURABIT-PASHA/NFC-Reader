@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class NFCManager {
@@ -27,12 +28,11 @@ public class NFCManager {
     private static final String Error_Detected = "No NFC Tag Detected";
     private static final String Write_Success = "Text Written Successfully";
     private static final String Write_Error = "Error during writing, try again";
-    private Context context;
-    private NfcAdapter nfcAdapter;
-    private PendingIntent pendingIntent;
-    private IntentFilter[] writingTagFilters;
+    private final Context context;
+    private final NfcAdapter nfcAdapter;
+    private final PendingIntent pendingIntent;
+    private final IntentFilter[] writingTagFilters;
     private Tag myTag;
-    private boolean writeMode;
 
     public NFCManager(Context context) {
         this.context = context;
@@ -47,12 +47,10 @@ public class NFCManager {
     }
 
     public void enableForegroundDispatch() {
-        writeMode = true;
         nfcAdapter.enableForegroundDispatch((AppCompatActivity) context, pendingIntent, writingTagFilters, null);
     }
 
     public void disableForegroundDispatch() {
-        writeMode = false;
         nfcAdapter.disableForegroundDispatch((AppCompatActivity) context);
     }
 
@@ -61,7 +59,7 @@ public class NFCManager {
             if (myTag == null) {
                 Toast.makeText(context, Error_Detected, Toast.LENGTH_LONG).show();
             } else {
-                LOGGER.info("Yazılmaya çalışılıyor");
+                LOGGER.info("Trying to write");
                 writeNdefMessage(createNdefMessage(text));
                 Toast.makeText(context, Write_Success, Toast.LENGTH_LONG).show();
             }
@@ -74,7 +72,7 @@ public class NFCManager {
     private NdefMessage createNdefMessage(String text) throws UnsupportedEncodingException {
         String lang = "en";
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        byte[] langBytes = lang.getBytes("US-ASCII");
+        byte[] langBytes = lang.getBytes(StandardCharsets.US_ASCII);
         int langLength = langBytes.length;
         int textLength = textBytes.length;
         byte[] payload = new byte[1 + langLength + textLength];
@@ -98,7 +96,7 @@ public class NFCManager {
                 ndef.writeNdefMessage(message);
                 ndef.close();
             } else {
-                Toast.makeText(context, "NFC Tag is not NDEF formatable.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "NFC Tag is not NDEF format-able.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -114,40 +112,32 @@ public class NFCManager {
                 NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)
         ) {
             LOGGER.info("Founded");
-            Toast.makeText(context,"Card Detected", Toast.LENGTH_LONG);
+            Toast.makeText(context,"Card Detected", Toast.LENGTH_LONG).show();
             Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            NdefMessage[] messages = null;
             if (rawMessages != null) {
-                messages = new NdefMessage[rawMessages.length];
-                for (int i = 0; i < rawMessages.length; i++) {
-                    messages[i] = (NdefMessage) rawMessages[i];
-                }
+                LOGGER.info("It's not a card");
+            }else{
+                LOGGER.info("Possible card");
+                setTag(intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+                LOGGER.info(Arrays.toString(myTag.getTechList()));
+                LOGGER.info(String.valueOf(myTag.describeContents()));
+                LOGGER.info(Arrays.toString(myTag.getId()));
             }
-            buildTagViews(messages);
         } else {
             Toast.makeText(context, "NFC Tag not found.", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void buildTagViews(NdefMessage[] messages) {
-        LOGGER.info("buildTagViews");
-        if (messages == null || messages.length == 0) return;
-        LOGGER.info("Mesaj var");
-        String text;
-        byte[] payload = messages[0].getRecords()[0].getPayload();
-        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
-        int languageCodeLength = payload[0] & 0063;
-        try {
-            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength, textEncoding);
-            LOGGER.info(text);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Error while reading NFC content.", Toast.LENGTH_LONG).show();
-        }
-    }
 
     public void onNewIntent(Intent intent) {
-        setTag(intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
         readFromIntent(intent);
+    }
+
+    private String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
     }
 }
