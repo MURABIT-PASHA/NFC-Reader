@@ -24,18 +24,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Called when the activity is going into the background. Disables foreground dispatch for NFC.
+     */
     @Override
     protected void onPause() {
         nfcManager.disableForegroundDispatch();
         super.onPause();
     }
 
+    /**
+     * Called when the activity is brought back to the foreground. Enables foreground dispatch for NFC.
+     */
     @Override
     protected void onResume() {
         nfcManager.enableForegroundDispatch();
         super.onResume();
     }
 
+    /**
+     * Called when a new NFC intent is delivered to this activity. Passes the intent to the NFCManager for handling.
+     *
+     * @param intent The new NFC intent containing the NFC data.
+     */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);

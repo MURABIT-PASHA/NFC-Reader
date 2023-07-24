@@ -22,6 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+/**
+ * The NFCManager class handles NFC interactions for the NFC Reader application.
+ * It provides methods to read and write data to NFC tags, and handles NFC-related events.
+ */
 public class NFCManager {
 
     public static final Logger LOGGER = Logger.getLogger("MEDAŞ");
@@ -34,6 +38,11 @@ public class NFCManager {
     private final IntentFilter[] writingTagFilters;
     private Tag myTag;
 
+    /**
+     * Constructor to create a new instance of NFCManager.
+     *
+     * @param context The context of the calling activity or application.
+     */
     public NFCManager(Context context) {
         this.context = context;
         nfcAdapter = NfcAdapter.getDefaultAdapter(context);
@@ -46,14 +55,25 @@ public class NFCManager {
         writingTagFilters = new IntentFilter[]{tagDetected};
     }
 
+    /**
+     * Enable foreground dispatch to handle NFC events.
+     */
     public void enableForegroundDispatch() {
         nfcAdapter.enableForegroundDispatch((AppCompatActivity) context, pendingIntent, writingTagFilters, null);
     }
 
+    /**
+     * Disable foreground dispatch for NFC events.
+     */
     public void disableForegroundDispatch() {
         nfcAdapter.disableForegroundDispatch((AppCompatActivity) context);
     }
 
+    /**
+     * Write data to the NFC tag using NdefMessage format.
+     *
+     * @param tagId The byte array representing the data to be written.
+     */
     public void writeNFC(byte[] tagId) {
         try {
             if (myTag == null) {
@@ -69,6 +89,13 @@ public class NFCManager {
         }
     }
 
+    /**
+     * Create an NdefMessage object from the given text data.
+     *
+     * @param text The text data to be included in the NdefMessage.
+     * @return The constructed NdefMessage.
+     * @throws UnsupportedEncodingException If the encoding is not supported.
+     */
     private NdefMessage createNdefMessage(String text) throws UnsupportedEncodingException {
         String lang = "en";
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
@@ -83,6 +110,13 @@ public class NFCManager {
         return new NdefMessage(new NdefRecord[]{recordNFC});
     }
 
+    /**
+     * Write an NdefMessage to the NFC tag using Ndef or NdefFormatable technologies.
+     *
+     * @param message The NdefMessage to be written.
+     * @throws IOException   If there is an I/O error during the write process.
+     * @throws FormatException If the NFC tag is not in NDEF format.
+     */
     private void writeNdefMessage(NdefMessage message) throws IOException, FormatException {
         NdefFormatable ndefFormatable = NdefFormatable.get(myTag);
         if (ndefFormatable != null) {
@@ -101,10 +135,20 @@ public class NFCManager {
         }
     }
 
+    /**
+     * Set the Tag object representing the detected NFC tag.
+     *
+     * @param tag The Tag object representing the NFC tag.
+     */
     public void setTag(Tag tag) {
         this.myTag = tag;
     }
 
+    /**
+     * Handle NFC intent and read data from the NFC tag.
+     *
+     * @param intent The intent containing NFC-related data.
+     */
     public void readFromIntent(Intent intent) {
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action) ||
@@ -128,11 +172,21 @@ public class NFCManager {
         }
     }
 
-
+    /**
+     * Handle new NFC intent and read data from the NFC tag.
+     *
+     * @param intent The new NFC intent containing NFC data.
+     */
     public void onNewIntent(Intent intent) {
         readFromIntent(intent);
     }
 
+    /**
+     * Convert a byte array to a hexadecimal string representation.
+     *
+     * @param bytes The byte array to be converted.
+     * @return The hexadecimal string representation of the byte array.
+     */
     private String bytesToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
